@@ -1,0 +1,31 @@
+api:
+  dashboard: true
+  insecure: true  # OK for lab only
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    address: ":443"
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    watch: true
+
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /certs/wordpress.crt
+        keyFile: /certs/wordpress.key
+
+log:
+  level: INFO

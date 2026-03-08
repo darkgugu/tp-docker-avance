@@ -1,0 +1,21 @@
+services:
+  # TRAEFIK - Proxy principal
+  traefik:
+    image: traefik:v2.9
+    container_name: traefik
+    restart: unless-stopped
+    ports:
+      - "80:80"      # HTTP
+      - "443:443"    # HTTPS  
+      - "8080:8080"  # Dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yml:/traefik.yml:ro
+      - ./certs:/certs:ro
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    name: traefik
+    driver: bridge
