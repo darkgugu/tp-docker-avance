@@ -1,6 +1,6 @@
 api:
   dashboard: true
-  insecure: true  # OK for lab only
+  insecure: true
 
 entryPoints:
   web:
@@ -19,13 +19,9 @@ providers:
     endpoint: "unix:///var/run/docker.sock"
     exposedByDefault: false
     watch: true
-
-tls:
-  stores:
-    default:
-      defaultCertificate:
-        certFile: /certs/wordpress.crt
-        keyFile: /certs/wordpress.key
+    network: traefik   # 👈 tells Traefik which network to use for all containers
 
 log:
-  level: INFO
+  level: DEBUG          # Use DEBUG while troubleshooting, switch to INFO after
+
+# No tls.stores block — Traefik will use its built-in self-signed cert

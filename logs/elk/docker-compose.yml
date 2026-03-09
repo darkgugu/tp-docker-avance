@@ -8,23 +8,33 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=false
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ports:
-      - "9200:9200"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.elasticsearch.rule=Host(`elasticsearch.local`)"
+      - "traefik.http.routers.elasticsearch.entrypoints=websecure"   # 👈 added
+      - "traefik.http.routers.elasticsearch.tls=true"
+      - "traefik.http.services.elasticsearch.loadbalancer.server.port=9200"
+      # removed deprecated traefik.docker.network label
     volumes:
       - esdata:/usr/share/elasticsearch/data
     networks:
       - elk
+      - traefik
 
   logstash:
     image: docker.elastic.co/logstash/logstash:8.12.2
     container_name: logstash
     environment:
       - "LS_JAVA_OPTS=-Xms256m -Xmx256m"
-    ports:
-      - "5044:5044"
-      - "9600:9600"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.logstash.rule=Host(`logstash.local`)"
+      - "traefik.http.routers.logstash.entrypoints=websecure"        # 👈 added
+      - "traefik.http.routers.logstash.tls=true"
+      - "traefik.http.services.logstash.loadbalancer.server.port=9600"
     networks:
       - elk
+      - traefik
     depends_on:
       - elasticsearch
 
@@ -33,10 +43,15 @@ services:
     container_name: kibana
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-    ports:
-      - "5601:5601"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kibana.rule=Host(`kibana.local`)"
+      - "traefik.http.routers.kibana.entrypoints=websecure"          # 👈 added
+      - "traefik.http.routers.kibana.tls=true"
+      - "traefik.http.services.kibana.loadbalancer.server.port=5601"
     networks:
       - elk
+      - traefik
     depends_on:
       - elasticsearch
 
@@ -46,3 +61,5 @@ volumes:
 networks:
   elk:
     driver: bridge
+  traefik:
+    external: true
