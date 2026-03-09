@@ -1,0 +1,27 @@
+api:
+  dashboard: true
+  insecure: true
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    address: ":443"
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    watch: true
+    network: traefik   # 👈 tells Traefik which network to use for all containers
+
+log:
+  level: DEBUG          # Use DEBUG while troubleshooting, switch to INFO after
+
+# No tls.stores block — Traefik will use its built-in self-signed cert
