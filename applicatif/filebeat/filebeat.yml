@@ -1,0 +1,12 @@
+filebeat.inputs:
+- type: container
+  paths:
+    - '/var/lib/docker/containers/*/*.log'
+
+output.console:
+  pretty: true
+
+# Enable HTTP endpoint for Traefik to route to
+http.enabled: true
+http.host: 0.0.0.0
+http.port: 5066

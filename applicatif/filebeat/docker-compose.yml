@@ -1,0 +1,29 @@
+services:
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.12.2
+    container_name: filebeat
+    user: root
+    command: filebeat -e -strict.perms=false
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.filebeat.rule=Host(`filebeat.local`)
+      - traefik.http.routers.filebeat.entrypoints=websecure
+      - traefik.http.routers.filebeat.tls=true
+      - traefik.http.services.filebeat.loadbalancer.server.port=5066
+      - traefik.docker.network=traefik
+    networks:
+      - traefik
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+networks:
+  traefik:
+    external: true
