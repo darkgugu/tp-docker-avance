@@ -1,0 +1,20 @@
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:2
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data
+    labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.uptime-kuma.rule=Host(`kuma.local`)"
+        - "traefik.http.routers.uptime-kuma.entrypoints=https"
+        - "traefik.http.routers.uptime-kuma.tls=true"
+        - "traefik.http.routers.uptime-kuma.tls.certresolver=myresolver"
+        - "traefik.http.services.uptime-kuma.loadBalancer.server.port=3001"
+    networks:
+      - traefik
+
+
+networks:  
+  traefik:
+    external: true
